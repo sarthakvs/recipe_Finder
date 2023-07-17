@@ -3,8 +3,8 @@ The Recipe Finder is a web app that enables users to search and discover recipes
 ![image](https://github.com/sarthakvs/recipe_Finder/assets/98168713/ef0ed719-26c5-4c9d-a538-24f45e6f7596)
 
 # Pre-requisites
-Ensure that you have Node installed in your system.(https://nodejs.org/en).
-Ensure that you have MongoDB installed in your system.(https://www.mongodb.com/try/download/community).
+1. Ensure that you have Node installed in your system.(https://nodejs.org/en)
+2. Ensure that you have MongoDB installed in your system.(https://www.mongodb.com/try/download/community).
 # How to run
 1. Download and extract the project
 2. In the command prompt,go to the project Directory and run npm install
