@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Recipe Finder</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      
+      body {
+        font-family: Arial, sans-serif;
+        background: linear-gradient(to bottom, #ffffff, #ffffff);
+        margin: 0;
+        padding: 0;
+      }
+      
+      nav {
+        background-color: #0f3f00;
+        color: #fff;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 20px;
+      }
+      
+      .nav-logo {
+        font-size: 24px;
+        font-weight: bold;
+      }
+      
+      .js-form {
+        display: flex;
+        align-items: center;
+      }
+      
+      #search-input {
+        padding: 10px; /* Increase the padding for more space inside the input */
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        margin-right: 10px;
+        width: 400px; /* Increase the width for a wider search input */ 
+      }
+      
+      .js-submit {
+        background-color: #003208;
+        color: rgb(255, 255, 255);
+        border: none;
+        border-radius: 10px;
+        padding: 12px 20px; /* Increase padding for more space inside the button */
+        cursor: pointer;
+      }
+      
+      .js-submit:hover {
+        background-color: #d32f2f;
+      }
+      .content {
+        margin: 30px;
+        text-align: center;
+      }
+      
+      .js-form2 {
+        background-color: rgba(255, 255, 255, 0.976);
+        padding: 20px;
+        border: 1px solid rgb(0, 0, 0);
+        border-radius: 30px;
+        padding: 10px;
+        box-shadow: 5px 10px #888888;
+        margin-top: 20px;
+      }
+      
+      #recipe-name,
+#recipe-ingredients,
+#recipe-instructions {
+  width: 100%;
+  padding: 12px; /* Increase padding for more space inside textboxes */
+  margin-bottom: 20px; /* Increase margin to add space between textboxes */
+  border: 1px solid #ccc;
+  border-radius: 8px; /* Increase border radius for rounded corners */
+}
+      .search-results{
+        border: 1px solid rgb(0, 0, 0);
+        border-radius: 30px;
+        padding: 10px;
+        box-shadow: 5px 10px #888888;
+        margin-top: 20px;
+        display: none;
+      }
+      .js-submit {
+        background-color: #003208;
+        color: rgb(255, 255, 255);
+        border: none;
+        border-radius: 10px;
+        padding: 10px 20px;
+        cursor: pointer;
+      }
+      
+      .js-submit:hover {
+        background-color: #9a9aa3;
+      }
+      .recipe-item {
+        /* Style for each recipe item */
+        background-color: #fff;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        padding: 10px;
+        margin: 10px 0; /* Add margin to separate recipe items */
+      }
+      .recipe-item h3 {
+        /* Style for recipe name */
+        font-size: 20px;
+        margin-bottom: 10px;
+      }
+      .recipe-item ul {
+        /* Style for the ingredients list */
+        list-style: none;
+        padding: 0;
+        margin-bottom: 10px;
+      }
+      .recipe-item ul li {
+        /* Style for each ingredient */
+        margin-left: 20px;
+      }
+      .recipe-item p {
+        /* Style for instructions (in separate lines) */
+        white-space: pre-line; /* Preserve line breaks */
+        margin: 0; /* Remove default paragraph margins */
+      }
+      .recipe-item b {
+        /* Style for bold text (Ingredients and Instructions) */
+        font-weight: bold;
+      }
+      .js-submit,
+#recipe-instructions {
+  margin-top: 10px;
+}
+    </style>
+  </head>
+  <body>
+    <nav>
+      <p class="logo">Recipe Finder</p>
+      <form class="js-form" id="search-form">
+        <input
+          type="text"
+          id="search-input"
+          placeholder="Enter recipe name"
+          autocomplete="on"
+        />
+        <button class="js-submit" type="submit">Search</button>
+      </form>
+    </nav>
+    <div class="content" style="display: flex; justify-content: space-between;">
+      <div style="flex: 1;">
+        <img src="/image/food.jpg" alt="error" width="600" height="400" />
+      </div>
+      <form class="js-form2" id="recipe-form" style="flex: 1;">
+        <input type="text" id="recipe-name" placeholder="Recipe Name" />
+        <input
+          class="js-ingre"
+          type="text"
+          id="recipe-ingredients"
+          placeholder="Ingredients (comma-separated)"
+        />
+        <textarea id="recipe-instructions" placeholder="Instructions"></textarea>
+        <button class="js-submit" type="submit">Add Recipe</button>
+      </form>
+    </div>
+    <div class="search-results">
+      <ul class="js-list" id="recipe-list" class="recipe-list"></ul>
+    </div>
+    <script>
+      const searchForm = document.getElementById("search-form");
+const searchInput = document.getElementById("search-input");
+const recipeList = document.getElementById("recipe-list");
+
+searchForm.addEventListener("submit", handleFormSubmit);
+function handleFormSubmit(e) {
+  e.preventDefault();
+  const searchTerm = searchInput.value.trim();
+  if (searchTerm !== "") {
+    searchRecipes(searchTerm);
+  }
+}
+
+function searchRecipes(searchTerm) {
+  fetch("/recipes")
+    .then((response) => response.json())
+    .then((data) => {
+      const results = data.filter((recipe) =>
+        recipe.name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      displayRecipes(results);
+    })
+    .catch((error) => console.error("Error searching recipes", error));
+}
+
+function displayRecipes(results) {
+  if (results.length === 0) {
+    // No results found, you can hide the section
+    document.querySelector(".search-results").style.display = "none";
+  } else {
+    // Results found, show the section
+    document.querySelector(".search-results").style.display = "block";
+  }
+  recipeList.innerHTML = "";
+  if (results.length === 0) {
+    const noResultsItem = document.createElement("li");
+    noResultsItem.textContent = "No recipes found.";
+    recipeList.appendChild(noResultsItem);
+  } else {
+    results.forEach((recipe) => {
+      const recipeItem = document.createElement("li");
+      recipeItem.classList.add("recipe-item"); // Add the class for styling
+
+      const recipeName = document.createElement("h3");
+      recipeName.textContent = `Name: ${recipe.name}`;
+      recipeItem.appendChild(recipeName);
+
+      const content = document.createElement("ul");
+      
+      // Ingredients
+      const ingredientsLabel = document.createElement("li");
+      ingredientsLabel.innerHTML = "<b>Ingredients:</b>";
+      content.appendChild(ingredientsLabel);
+
+      const ingredientsList = document.createElement("ul");
+      recipe.ingredients.forEach((ingredient, index) => {
+        const ingredientItem = document.createElement("li");
+        ingredientItem.textContent = `${index + 1}. ${ingredient}`; // Add numbering
+        ingredientsList.appendChild(ingredientItem);
+      });
+      content.appendChild(ingredientsList);
+
+      // Instructions
+      const instructionsLabel = document.createElement("li");
+      instructionsLabel.innerHTML = "<b>Instructions:</b>";
+      content.appendChild(instructionsLabel);
+
+      const instructions = document.createElement("p");
+
+      // Check if instructions is a string, then split it into an array
+      if (typeof recipe.instructions === 'string') {
+        const instructionArray = recipe.instructions.split('\n');
+        instructions.textContent = instructionArray.join('\n');
+      } else {
+        // Handle as an array
+        instructions.textContent = recipe.instructions.join('\n');
+      }
+      content.appendChild(instructions);
+
+      recipeItem.appendChild(content);
+      recipeList.appendChild(recipeItem);
+    });
+  }
+}
+
+const recipeForm = document.getElementById("recipe-form");
+
+recipeForm.addEventListener("submit", handleRecipeFormSubmit);
+
+function handleRecipeFormSubmit(event) {
+  event.preventDefault();
+  const name = document.getElementById("recipe-name").value.trim();
+  const ingredients = document
+    .getElementById("recipe-ingredients")
+    .value.trim();
+  const instructions = document
+    .getElementById("recipe-instructions")
+    .value.trim();
+
+  if (name === "" || ingredients === "" || instructions === "") {
+    alert("Please fill in all fields");
+    return;
+  }
+
+  addRecipe(name, ingredients, instructions);
+  recipeForm.reset();
+}
+
+function addRecipe(name, ingredients, instructions) {
+  const data = { name, ingredients, instructions };
+
+  fetch("/recipes", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  })
+    .then((response) => response.text())
+    .then((message) => {
+      alert(message);
+      searchRecipes("");
+    })
+    .catch((error) => console.error("Error adding recipe:", error));
+}
+
+    </script>
+  </body>
+</html>
